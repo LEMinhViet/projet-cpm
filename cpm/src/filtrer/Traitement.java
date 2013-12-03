@@ -64,11 +64,11 @@ public class Traitement {
 			if (valide)
 			{
 				nb++;
-				System.out.println(ligne);
+				//System.out.println(ligne);
 			}
 				
 		}
-		System.out.println(nb);
+		//System.out.println(nb);
 		br.close();
 	}
 	

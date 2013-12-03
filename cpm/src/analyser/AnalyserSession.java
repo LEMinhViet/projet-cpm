@@ -9,8 +9,8 @@ import logs.Session;
 import logs.Utilisateur;
 
 /**
- * À partir de la question 2.4, on doit travailler sur des parcours et non pas des requêtes
- * Cette classe est pour séparer avec la première partie du programme
+ * e partir de la question 2.4, on doit travailler sur des parcours et non pas des requetes
+ * Cette classe est pour separer avec la premiere partie du programme
  */
 public class AnalyserSession {
 		
@@ -23,12 +23,12 @@ public class AnalyserSession {
 		
 		traiterPages();
 //		afficherPages();
-		trierPages(Page.NOMBRE_FIN);
+		trierPages(Page.NOMBRE_TOTAL);
 		afficherPages(10);
 	}
 	
 	/**
-	 * Chercher tous les pages dans les requêtes, sauf lés pages blanche
+	 * Chercher tous les pages dans les requetes, sauf les pages blanche
 	 */
 	public void traiterPages() {
 		String reference;
@@ -65,7 +65,7 @@ public class AnalyserSession {
 	}
 	
 	/**
-	 * Si il y a dèja la page dans la liste, incrementer ses nombres de visite
+	 * Si il y a deja la page dans la liste, incrementer ses nombres de visite
 	 * Si non, ajouter une page dans la liste
 	 */
 	public void addPage(String page, boolean estDebutDeSession, boolean estFinDeSession) {
@@ -101,7 +101,7 @@ public class AnalyserSession {
         for (int i = 0; i < pages.size(); i++) {
             for (int j = i + 1; j < pages.size(); j++) {
                 if (pages.get(j).getNombre(type) > pages.get(i).getNombre(type)) {
-                	// échanger les 2 pages
+                	// echanger les 2 pages
                     tmpPage = new Page(pages.get(j));
                     
                     pages.set(j, pages.get(i));
