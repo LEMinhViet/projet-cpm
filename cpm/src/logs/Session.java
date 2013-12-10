@@ -1,14 +1,12 @@
 package logs;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Session {
     // Une session a ses requetes
     private ArrayList<Requete> requetes = new ArrayList<Requete>();
-    
-    public void Session() {
-        
-    }
+    private int[] pagesVisites;
     
     public void addRequete(Requete req) {
     	requetes.add(req);
@@ -30,6 +28,22 @@ public class Session {
     
     public long getDuree() {
     	return getDerniereRequete().getTimeInMillis() - requetes.get(0).getTimeInMillis();
+    }
+    
+    public void genererPagesVisites(List<Page> pages) {
+    	pagesVisites = new int[pages.size()];
+    	
+    	for (Requete req : requetes) {
+    		for (int i = 0; i < pages.size(); i++) {
+    			if (req.getPage().equals(pages.get(i).getLien())) {
+    				pagesVisites[i] = 1;
+    			}
+    		}
+    	}
+    }
+    
+    public int[] getPagesVisites() {
+    	return pagesVisites;
     }
 }
 

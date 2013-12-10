@@ -12,6 +12,11 @@ public class CPMCalendar extends GregorianCalendar {
 	// Avec le texte qu'on filtre du fichier log, on utilise cette fonction pour
 	// sauvegarder tous les infos (Date, Temps, TimeZone)
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public CPMCalendar(String date) {		
 		super();
 		

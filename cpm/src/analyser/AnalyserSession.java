@@ -1,10 +1,9 @@
 package analyser;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import logs.Page;
-import logs.Requete;
 import logs.Session;
 import logs.Utilisateur;
 
@@ -15,30 +14,41 @@ import logs.Utilisateur;
 public class AnalyserSession {
 		
 	private List<Utilisateur> utilisateurs;
+	private List<Session> sessions;
 	private List<Page> pages;
+	
+	private TraiterARFF traiterArff;
 	
 	public AnalyserSession(List<Utilisateur> utilisateurs) {
 		this.utilisateurs = utilisateurs;
-		pages = new LinkedList<Page>();
+		pages = new ArrayList<Page>();
+		sessions = new ArrayList<Session>();
 		
 		traiterPages();
-//		afficherPages();
-		trierPages(Page.NOMBRE_TOTAL);
-		afficherPages(10);
+		
+		genererPagesVisitesPourSession();
+		
+		traiterArff = new TraiterARFF();
+		traiterArff.creerARFF(sessions, pages, "Bourges.arff");
+		traiterArff.traiterARFF_KMeans("Bourges.arff", 30);
+		traiterArff.interpreterCluster("Bourges_kmeans.arff");
 	}
 	
 	/**
 	 * Chercher tous les pages dans les requetes, sauf les pages blanche
 	 */
 	public void traiterPages() {
-		String reference;
+		String page;
 		
 		for (Utilisateur u : utilisateurs) {
 			for (Session ses : u.getSessions()) {
+				
+				sessions.add(ses);
+				
 				for (int i = 0; i < ses.getRequetes().size(); i++) {
-					reference = ses.getRequetes().get(i).getReference();
-					if (!reference.equals("-")) {
-						addPage(reference, 
+					page = ses.getRequetes().get(i).getPage();
+					if (!page.equals("-")) {
+						addPage(page, 
 								i == 0,  // La requete est au debut de session ou non
 								i == ses.getRequetes().size() - 1); // La requete est en fin de session ou non
 					}
@@ -110,5 +120,11 @@ public class AnalyserSession {
                 }
             }
         }       
+	}
+	
+	public void genererPagesVisitesPourSession() {
+		for (Session ses : sessions) {
+			ses.genererPagesVisites(pages);
+		}
 	}
 }

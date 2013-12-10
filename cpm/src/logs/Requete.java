@@ -2,10 +2,8 @@ package logs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import core.CPMCalendar;
-import filtrer.FormatLog;
 import filtrer.Traitement;
 
 public class Requete {
@@ -48,6 +46,10 @@ public class Requete {
 	
 	public String getReference() {
 		return reference;
+	}
+	
+	public String getPage() {
+		return contenue.split(" ")[1];
 	}
 
 }

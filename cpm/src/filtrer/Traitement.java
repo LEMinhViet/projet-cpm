@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import analyser.AnalyserSession;
+import logs.Page;
 import logs.Requete;
 import logs.Session;
 import logs.Utilisateur;
@@ -68,7 +69,7 @@ public class Traitement {
 			}
 				
 		}
-		//System.out.println(nb);
+		System.out.println(nb);
 		br.close();
 	}
 	
@@ -107,8 +108,10 @@ public class Traitement {
 			}
 		}
 		
-		System.out.println(" Il y a " + nomSession + " sessions dans " + nomReq + " requetes \n" +
+		if (nomSession != 0) {
+			System.out.println(" Il y a " + nomSession + " sessions dans " + nomReq + " requetes \n" +
 								"  dans " + (dureeSession / 1000)  + " seconds donc la duree moyenne est " + (dureeSession / 1000) / nomSession);
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -129,5 +132,7 @@ public class Traitement {
 		
 		// Pour la question 2.4
 		AnalyserSession analyserSession = new AnalyserSession(utilisateurs);		
+		analyserSession.trierPages(Page.NOMBRE_TOTAL);
+		analyserSession.afficherPages(10);
 	}	
 }
