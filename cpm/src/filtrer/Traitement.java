@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,9 +44,14 @@ public class Traitement {
 	public void addFiltre(Filtre f) {
 		filtrage.add(f);
 	}
+	
+	public void removeTousFiltres() {
+		filtrage.clear();
+	}
 
-	public void traiteFiltre() throws IOException {
+	public String traiteFiltre() throws IOException {
 
+		String resultat = "";
 		int nb = 0;
 		InputStream ips = new FileInputStream(fichier);
 		InputStreamReader ipsr = new InputStreamReader(ips);
@@ -65,12 +71,15 @@ public class Traitement {
 
 			if (valide) {
 				nb++;
-				// System.out.println(ligne);
+				resultat += ligne + "\n";
+				System.out.println(ligne);
 			}
 
 		}
 		System.out.println(nb);
 		br.close();
+		
+		return resultat;
 	}
 
 	/**
@@ -115,25 +124,33 @@ public class Traitement {
 		}
 	}
 
-	public static void main(String[] args) throws IOException {
-		Traitement t = new Traitement("bourges.txt");
-		Format f = new FormatLog();
-
-		// Pour la question 2.1
-		t.addFiltre(new FiltreStatutHTTP(f, "2..|3.."));
-		t.addFiltre(new FiltreTypeFichier(f, ".htm|.html"));
-		// t.addFiltre(new FiltreNavigateurs(f));
-		// t.addFiltre(new FiltreDate(f, "05/Sep/2004", "05/Sep/2004"));
-		// t.addFiltre(new FiltreIP(f, "hamburg047.server4you.de"));
-		t.addFiltre(new StockerLogs(f));
-		t.traiteFiltre();
-
-		// Pour la question 2.3
-		t.afficherNombreDeSession();
-
-		// Pour la question 2.4
-		AnalyserSession analyserSession = new AnalyserSession(utilisateurs);
-		analyserSession.trierPages(Page.NOMBRE_TOTAL);
-		analyserSession.afficherPages(10);
+//	public static void main(String[] args) throws IOException {
+//		Traitement t = new Traitement("bourges.txt");
+//		Format f = new FormatLog();
+//
+//		// Pour la question 2.1
+//		t.addFiltre(new FiltreStatutHTTP(f, "2..|3.."));
+//		t.addFiltre(new FiltreTypeFichier(f, ".htm|.html"));
+//		// t.addFiltre(new FiltreNavigateurs(f));
+//		// t.addFiltre(new FiltreDate(f, "05/Sep/2004", "05/Sep/2004"));
+//		// t.addFiltre(new FiltreIP(f, "hamburg047.server4you.de"));
+//		t.addFiltre(new StockerLogs(f));
+//		t.traiteFiltre();
+//
+//		// Pour la question 2.3
+//		t.afficherNombreDeSession();
+//
+//		// Pour la question 2.4
+//		AnalyserSession analyserSession = new AnalyserSession(utilisateurs);
+//		analyserSession.trierPages(Page.NOMBRE_TOTAL);
+//		analyserSession.afficherPages(10);
+//	}
+	
+	public String getFichier() {
+		return fichier;
+	}
+	
+	public List<Filtre> getFiltrage() {
+		return filtrage;
 	}
 }
