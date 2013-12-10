@@ -30,7 +30,7 @@ public class AnalyserSession {
 		
 		traiterArff = new TraiterARFF();
 		traiterArff.creerARFF(sessions, pages, "Bourges.arff");
-		traiterArff.traiterARFF_KMeans("Bourges.arff", 30);
+		traiterArff.traiterARFF_KMeans("Bourges.arff", 10);
 		traiterArff.interpreterCluster("Bourges_kmeans.arff");
 	}
 	
