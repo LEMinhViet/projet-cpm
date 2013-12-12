@@ -5,12 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import analyser.AnalyserSession;
-import logs.Page;
 import logs.Requete;
 import logs.Session;
 import logs.Utilisateur;
@@ -33,6 +31,8 @@ public class Traitement {
 	// Parce que'n doit trier les requetes par utilisateur, donc on stocke les
 	// utilisateurs dans cette liste
 	private static List<Utilisateur> utilisateurs;
+	
+	private AnalyserSession analyserSession;
 	private String fichier;
 
 	public Traitement(String fichier) {
@@ -104,7 +104,7 @@ public class Traitement {
 	/**
 	 * Traverser tous les utilisateurs pour denombrer le nombre des sessions
 	 */
-	public void afficherNombreDeSession() {
+	public int afficherNombreDeSession() {
 		int nomSession = 0;
 		long dureeSession = 0;
 		int nomReq = 0;
@@ -120,8 +120,9 @@ public class Traitement {
 
 		if (nomSession != 0) {
 			System.out.println(" Il y a " + nomSession + " sessions dans " + nomReq + " requetes \n" + "  dans " + (dureeSession / 1000)
-					+ " seconds donc la duree moyenne est " + (dureeSession / 1000) / nomSession);
+					+ " seconds => la duree moyenne est " + (dureeSession / 1000) / nomSession);
 		}
+		return nomSession;
 	}
 
 //	public static void main(String[] args) throws IOException {
@@ -146,11 +147,31 @@ public class Traitement {
 //		analyserSession.afficherPages(10);
 //	}
 	
+	public void analyserSession() {
+		analyserSession = new AnalyserSession(utilisateurs);
+	}
+	
+	public void trierPages(int type) {
+		analyserSession.trierPages(type);
+	}
+	
+	public String creerARFF(String nomFichier) {
+		return analyserSession.creerARFF(nomFichier);
+	}
+	
+	public String analyserARFF(String nomFichier) {
+		return analyserSession.analyserARFF(nomFichier);
+	}
+	
 	public String getFichier() {
 		return fichier;
 	}
 	
 	public List<Filtre> getFiltrage() {
 		return filtrage;
+	}
+	
+	public AnalyserSession getAnalyserSession() {
+		return analyserSession;
 	}
 }

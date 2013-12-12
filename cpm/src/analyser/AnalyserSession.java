@@ -28,10 +28,10 @@ public class AnalyserSession {
 		
 		genererPagesVisitesPourSession();
 		
-		traiterArff = new TraiterARFF();
-		traiterArff.creerARFF(sessions, pages, "Bourges.arff");
-		traiterArff.traiterARFF_KMeans("Bourges.arff", 10);
-		traiterArff.interpreterCluster("Bourges_kmeans.arff");
+//		traiterArff = new TraiterARFF();
+//		traiterArff.creerARFF(sessions, pages, "Bourges.arff");
+//		traiterArff.traiterARFF_KMeans("Bourges.arff", 10);
+//		traiterArff.interpreterCluster("Bourges_kmeans.arff");
 	}
 	
 	/**
@@ -122,9 +122,28 @@ public class AnalyserSession {
         }       
 	}
 	
+	public List<Page> getPages() {
+		return pages;
+	}
+	
+	
+	/*
+	 * Les fonctions pour traiter fichier ARFF
+	 */
 	public void genererPagesVisitesPourSession() {
 		for (Session ses : sessions) {
 			ses.genererPagesVisites(pages);
 		}
+	}
+
+	public String creerARFF(String nomFichier) {
+		traiterArff = new TraiterARFF();
+		traiterArff.creerARFF(sessions, pages, nomFichier.split("\\.")[0] + ".arff");	// Couper .txt dans le fichier logs
+		return nomFichier.split("\\.")[0] + ".arff";
+	}
+	
+	public String analyserARFF(String nomFichier) {
+		traiterArff.traiterARFF_KMeans(nomFichier, 10);
+		return traiterArff.interpreterCluster(nomFichier.split("\\.")[0] + "_kmeans.arff"); 
 	}
 }

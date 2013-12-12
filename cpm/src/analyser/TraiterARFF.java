@@ -70,6 +70,7 @@ public class TraiterARFF {
 			fr.close();
 			
 			kmeans.setNumClusters(nbCluster);
+//			kmeans.setDistanceFunction(new EuclideanDistance());
 			kmeans.buildClusterer(instances);
 			
 			ArffSaver arffSaver = new ArffSaver();
@@ -89,7 +90,7 @@ public class TraiterARFF {
 		}		
 	}
 	
-	public void interpreterCluster(String nom) {
+	public String interpreterCluster(String nom) {
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(nom)));
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nom.replace(".arff", ".clusters"))));
@@ -137,5 +138,7 @@ public class TraiterARFF {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return nom.replace(".arff", ".clusters");
 	}
 }

@@ -49,7 +49,11 @@ public class Requete {
 	}
 	
 	public String getPage() {
-		return contenue.split(" ")[1];
+		if (contenue.split(" ").length > 1) {
+			return contenue.split(" ")[1];
+		} else {
+			return "";
+		}
 	}
 
 }
