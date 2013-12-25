@@ -18,6 +18,7 @@ import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -37,6 +38,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import filtrer.CoffeeLog;
 import filtrer.Filtre;
 import filtrer.FiltreDate;
 import filtrer.FiltreIP;
@@ -119,6 +121,9 @@ public class MainGUI {
 				try {
 					MainGUI window = new MainGUI();
 					window.mainFrame.setVisible(true);
+					
+					CoffeeLog coffeeLog = new CoffeeLog();
+					coffeeLog.transformerCoffeeLog("TraceLogs2012.12.11.14.30.41.xml");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -173,7 +178,7 @@ public class MainGUI {
 				traitement.removeTousFiltres();
 				
 				if (CheckBox_Date.isSelected()) {
-					SimpleDateFormat format = ((JSpinner.DateEditor)spinner_DateDebut.getEditor()).getFormat();				
+					SimpleDateFormat format = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH);			
 					// Pour obtenir le value du jSpinner (Date) and formatter le date sous forme : 05/Sep/2004   
 					traitement.addFiltre(new FiltreDate(f, format.format((Date)spinner_DateDebut.getValue()), 
 														   format.format((Date)spinner_DateFin.getValue())));

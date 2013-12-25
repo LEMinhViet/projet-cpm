@@ -1,6 +1,6 @@
 package filtrer;
 
-import core.CPMCalendar;
+import support.CPMCalendar;
 
 public class FiltreDate extends Filtre {
 

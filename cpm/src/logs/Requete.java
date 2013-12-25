@@ -3,7 +3,7 @@ package logs;
 import java.util.ArrayList;
 import java.util.List;
 
-import core.CPMCalendar;
+import support.CPMCalendar;
 import filtrer.Traitement;
 
 public class Requete {
