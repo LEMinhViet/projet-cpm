@@ -9,14 +9,13 @@ import java.util.TimeZone;
 
 public class CPMCalendar extends GregorianCalendar {
 		
-	// Avec le texte qu'on filtre du fichier log, on utilise cette fonction pour
-	// sauvegarder tous les infos (Date, Temps, TimeZone)
+	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * 
+	 * Avec le texte qu'on filtre du fichier log, on utilise cette fonction pour
+	 * sauvegarder tous les infos (Date, Temps, TimeZone)
+	 * @param date
 	 */
-	private static final long serialVersionUID = 1L;
-
 	public CPMCalendar(String date) {		
 		super();
 		
@@ -38,9 +37,12 @@ public class CPMCalendar extends GregorianCalendar {
 		
 	}
 	
-	// Avec le texte qui a seulement la date (sans temps, sans TimeZone, utilisé pour comparer les dates), 
-	// on utilise cette fonction 
-	
+	/**
+	 *  Avec le texte qui a seulement la date (sans temps, sans TimeZone, utilisé pour comparer les dates), 
+	 *  on utilise cette fonction 
+	 * @param date
+	 * @param timeZone
+	 */
 	public CPMCalendar(String date, TimeZone timeZone) {		
 		super();
 		
@@ -57,6 +59,22 @@ public class CPMCalendar extends GregorianCalendar {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+	}
+	
+	/**
+	 * Initialiser une Date a partir de milliseconds
+	 * @param millis : milliseconds
+	 */
+	public CPMCalendar(long millis) {		
+		super();
+		setTimeZone(TimeZone.getTimeZone("GMT+0200"));
+		setTimeInMillis(millis);
+	}
+	
+	public String getDateString() {
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss Z");
+		format.setTimeZone(getTimeZone());
+		return format.format(this.getTime());
 	}
 	
 	/**

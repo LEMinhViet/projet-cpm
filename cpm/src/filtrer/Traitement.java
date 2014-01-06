@@ -83,7 +83,7 @@ public class Traitement {
 	}
 
 	/**
-	 * LE : cette fonction est pour ajouter un utilisateur dans la liste -
+	 * Cette fonction est pour ajouter un utilisateur dans la liste -
 	 * Ajouter un nouveau utilisateur s'il n'existe pas - Si non, ajouter un
 	 * nouveau requete dans cet utilisateur
 	 * 

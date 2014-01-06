@@ -37,8 +37,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.parsers.ParserConfigurationException;
 
-import filtrer.CoffeeLog;
+import org.xml.sax.SAXException;
+
+import support.CoffeeToLog;
 import filtrer.Filtre;
 import filtrer.FiltreDate;
 import filtrer.FiltreIP;
@@ -66,7 +69,7 @@ public class MainGUI {
 	
 	private JPanel panel_fichier;
 	private JPanel panel_filtrage;
-	private JButton Button_fichier;
+	private JButton btnFichier;
 	private Box verticalBox;
 	private JButton Button_Filtrage;
 	private Box horizontalBox;
@@ -110,6 +113,9 @@ public class MainGUI {
 	private JLabel lblResultatAnalyser;
 	private Box horizontalBox_Stats;
 	private JLabel lblResultatStats;
+	private JLabel lblChargerXML;
+	private JButton Button_XML;
+	private Component fichierStut;
 
 	/**
 	 * Launch the application.
@@ -121,9 +127,6 @@ public class MainGUI {
 				try {
 					MainGUI window = new MainGUI();
 					window.mainFrame.setVisible(true);
-					
-					CoffeeLog coffeeLog = new CoffeeLog();
-					coffeeLog.transformerCoffeeLog("TraceLogs2012.12.11.14.30.41.xml");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -143,8 +146,34 @@ public class MainGUI {
 	 */
 	private void initialize() {
 		creationInterface();
+		
+		Button_XML.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Choisir le fichier logs
+				JFileChooser c = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml", "xml");
+				c.setFileFilter(filter);
+				c.setCurrentDirectory(new File("/users/Etu1/3261731/workspace/cpm"));
 
-		Button_fichier.addActionListener(new ActionListener() {
+				// Demonstrater "Open" dialog:
+				int rVal = c.showOpenDialog(mainFrame);
+				if (rVal == JFileChooser.APPROVE_OPTION) {
+					try {
+						// Transformer le fichier coffee au fichier log, 
+						// et le sauvegarder dans la meme location avec le fichier coffee 
+						CoffeeToLog coffeeToLog = new CoffeeToLog();
+						coffeeToLog.transformerCoffeeLog(c.getSelectedFile().getAbsolutePath());
+					} catch (ParserConfigurationException | SAXException
+							| IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		
+		btnFichier.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Choisir le fichier logs
 				JFileChooser c = new JFileChooser();
@@ -247,15 +276,11 @@ public class MainGUI {
 		});
 		
 	}
-
-	public void traite() {
-		if (tache != null && !tache.isDone()) {
-			tache.cancel(true);
-		}
-		tache = new Sleeper();
-        tache.execute();
-	}
 	
+	/**
+	 * Retirer nombre de lignes dans le fichier logs (plus vite)
+	 * @param nom
+	 */
 	public void getNbLignes(String nom) {
 		try {
 			LineNumberReader lnr = new LineNumberReader(new FileReader(nom));
@@ -270,7 +295,18 @@ public class MainGUI {
 		}
 	}
 	
-	//SwingWorker class is used to simulate a task being performed
+	/**
+	 * Creer et executer la tache de lire et valider le fichier log
+	 */
+	public void traite() {
+		if (tache != null && !tache.isDone()) {
+			tache.cancel(true);
+		}
+		tache = new Sleeper();
+        tache.execute();
+	}
+	
+	// SwingWorker classe est pour simuler une tache 
 	class Sleeper extends SwingWorker<String, String> {	
 		@Override
 		public String doInBackground() throws InterruptedException {	   
@@ -330,6 +366,9 @@ public class MainGUI {
 		}
 	}
 
+	/**
+	 * Creer l'interface du programme
+	 */
 	public void creationInterface() {
 		
 		try {
@@ -354,13 +393,25 @@ public class MainGUI {
 		horizontalBox = Box.createHorizontalBox();
 		panel_fichier.add(horizontalBox);
 		
+		lblChargerXML = new JLabel("0. Charger le fichier XML :      ");
+		lblChargerXML.setHorizontalAlignment(SwingConstants.TRAILING);
+		horizontalBox.add(lblChargerXML);
+		lblChargerXML.setAlignmentX(0.5f);
+		
+		Button_XML = new JButton("XML");
+		Button_XML.setAlignmentX(0.5f);
+		horizontalBox.add(Button_XML);
+		
+		fichierStut = Box.createHorizontalStrut(80);
+		horizontalBox.add(fichierStut);
+		
 		lblCharger = new JLabel("1. Charger le fichier Logs :      ");
 		lblCharger.setAlignmentX(Component.CENTER_ALIGNMENT);
 		horizontalBox.add(lblCharger);
 		
-		Button_fichier = new JButton("fichier");
-		Button_fichier.setAlignmentX(Component.CENTER_ALIGNMENT);
-		horizontalBox.add(Button_fichier);
+		btnFichier = new JButton("Fichier");
+		btnFichier.setAlignmentX(Component.CENTER_ALIGNMENT);
+		horizontalBox.add(btnFichier);
 
 		panel_filtrage = new JPanel();
 		panel_filtrage.setToolTipText("");
