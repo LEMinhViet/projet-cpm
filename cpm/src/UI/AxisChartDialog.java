@@ -88,7 +88,7 @@ public class AxisChartDialog extends JDialog {
         panel = new JPanel();
         verticalBox.add(panel);
         
-        lbl_Choisir = new JLabel("Choisir le type de trier les pages : ");
+        lbl_Choisir = new JLabel("Choisir le type de tryage :");
         panel.add(lbl_Choisir);
         
         // add the chart to a panel...
@@ -97,9 +97,9 @@ public class AxisChartDialog extends JDialog {
         chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
         
         comboBox_Type = new JComboBox<String>();
-        comboBox_Type.setModel(new DefaultComboBoxModel<String>(new String[] {"Nombre de visites", 
-        																	  "Nombre de visites en debut de session", 
-        																	  "Nombre de visites en fin de session"}));
+        comboBox_Type.setModel(new DefaultComboBoxModel<String>(new String[] {"Par nombre de visites total", 
+        																	  "Par nombre de visites en debut de session", 
+        																	  "Par nombre de visites en fin de session"}));
         comboBox_Type.setSelectedIndex(0);
         panel.add(comboBox_Type);      
 	}

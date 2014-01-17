@@ -35,7 +35,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -163,6 +162,17 @@ public class MainGUI {
 						// et le sauvegarder dans la meme location avec le fichier coffee 
 						CoffeeToLog coffeeToLog = new CoffeeToLog();
 						coffeeToLog.transformerCoffeeLog(c.getSelectedFile().getAbsolutePath());
+						
+						nomFichierLog = c.getSelectedFile().getName().replace("xml", "txt");
+						// Obtenir le nombre des lignes dans le fichier logs					
+		    		    getNbLignes(nomFichierLog);
+						
+						Button_Filtrage.setEnabled(true);
+						Button_Statistiques.setEnabled(false);
+						Button_Creer.setEnabled(false);
+						Button_CreationResultat.setEnabled(false);
+						Button_Analyser.setEnabled(false);
+						Button_AnalyseResultat.setEnabled(false);			
 					} catch (ParserConfigurationException | SAXException
 							| IOException e1) {
 						// TODO Auto-generated catch block
@@ -207,10 +217,12 @@ public class MainGUI {
 				traitement.removeTousFiltres();
 				
 				if (CheckBox_Date.isSelected()) {
+
 					SimpleDateFormat format = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH);			
 					// Pour obtenir le value du jSpinner (Date) and formatter le date sous forme : 05/Sep/2004   
-					traitement.addFiltre(new FiltreDate(f, format.format((Date)spinner_DateDebut.getValue()), 
+					traitement.addFiltre(new FiltreDate(f, (format.format((Date)spinner_DateDebut.getValue())), 
 														   format.format((Date)spinner_DateFin.getValue())));
+					System.out.println("date " + format.format((Date)spinner_DateDebut.getValue()));
 				} 
 				
 				if (CheckBox_Fichier.isSelected()) {
@@ -371,11 +383,11 @@ public class MainGUI {
 	 */
 	public void creationInterface() {
 		
-		try {
-		    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch(Exception e) {
-	        System.out.println("UIManager Exception : "+e);
-		}
+//		try {
+//		    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//		} catch(Exception e) {
+//	        System.out.println("UIManager Exception : "+e);
+//		}
 
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Analyse de traces");
