@@ -290,9 +290,6 @@ public class MainGUI {
 				} else {
 					AxisChart_Log axisChart = new AxisChart_Log(traitement.getAnalyserSession());
 					axisChart.setVisible(true);
-				}
-				
-				if (utiliseXML) {
 					Button_Creer.setEnabled(true);
 				}
 				

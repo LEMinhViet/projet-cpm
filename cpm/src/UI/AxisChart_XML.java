@@ -121,7 +121,6 @@ public class AxisChart_XML extends JFrame {
         );
 
         // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
-//        chart.setBackgroundPaint(Color.darkGray);
 
         // get a reference to the plot for further customisation...
         final CategoryPlot plot = chart.getCategoryPlot();
