@@ -21,7 +21,8 @@ public class StockerLogs extends Filtre {
 			List<String> s = f.creer(ligne);
 			
 			Traitement.addUtilisateur(new Utilisateur(s.get(Traitement.SECTION_AGENT_UTILISATEUR), 
-													  s.get(Traitement.SECTION_IP)), 
+													  s.get(Traitement.SECTION_IP),
+													  s.get(Traitement.SECTION_UTILISATEUR)), 
 									  new Requete(s.get(Traitement.SECTION_TEMPS),
 											  	  s.get(Traitement.SECTION_CONTENUE), 
 											  	  s.get(Traitement.SECTION_STATUT_HTTP), 

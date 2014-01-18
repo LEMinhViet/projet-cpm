@@ -11,7 +11,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 public class TexteDialog extends JDialog {
@@ -28,11 +27,11 @@ public class TexteDialog extends JDialog {
 	public TexteDialog(String nomFichier) {
 		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		try {
-		    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch(Exception e) {
-	        System.out.println("UIManager Exception : "+e);
-		}
+//		try {
+//		    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//		} catch(Exception e) {
+//	        System.out.println("UIManager Exception : "+e);
+//		}
 		
 		setBounds(100, 100, 500, 400);
 		getContentPane().setLayout(new BorderLayout());

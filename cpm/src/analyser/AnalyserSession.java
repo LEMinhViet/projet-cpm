@@ -27,11 +27,6 @@ public class AnalyserSession {
 		traiterPages();
 		
 		genererPagesVisitesPourSession();
-		
-//		traiterArff = new TraiterARFF();
-//		traiterArff.creerARFF(sessions, pages, "Bourges.arff");
-//		traiterArff.traiterARFF_KMeans("Bourges.arff", 10);
-//		traiterArff.interpreterCluster("Bourges_kmeans.arff");
 	}
 	
 	/**
@@ -124,6 +119,10 @@ public class AnalyserSession {
 	
 	public List<Page> getPages() {
 		return pages;
+	}
+	
+	public List<Utilisateur> getUtilisateurs() {
+		return utilisateurs;
 	}
 	
 	

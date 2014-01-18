@@ -7,14 +7,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import logs.Page;
+import logs.Utilisateur;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -22,23 +24,26 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import analyser.AnalyserSession;
 
-import javax.swing.Box;
-
-public class AxisChartDialog extends JDialog {
+public class AxisChart_XML extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final int NB_ELEMENT = 10;
-	private final int NB_SERIE = 3;
+	private final int TYPE_INTERACTION = 0;
+	 private final int TYPE_LONGEUR = 1;
+	private final int NB_ELEMENT = 15;
+	private final int NB_SERIE_INTERACTION = 4;
+	private final int NB_SERIE_LONGEUR = 1;
 	
 	private final JPanel contentPanel = new JPanel();
 	
@@ -50,32 +55,29 @@ public class AxisChartDialog extends JDialog {
 	private ChartPanel chartPanel;
 	private AnalyserSession analyserSession;
 	
-	private int typeDeTrier = 0;
-	
 	/**
-	 * Create the dialog.
+	 * Create the frame.
 	 */
-	public AxisChartDialog(AnalyserSession analyserSession) {
+	public AxisChart_XML(AnalyserSession analyserSession) {
 		this.analyserSession = analyserSession;
 		
 		creerInterface();
 		
-        comboBox_Type.addActionListener(new ActionListener() {
+		comboBox_Type.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		typeDeTrier = comboBox_Type.getSelectedIndex();
-
         		verticalBox.remove(chartPanel);
         		verticalBox.revalidate();
-        		chartPanel = new ChartPanel(creerCarte());
+        		chartPanel = new ChartPanel(creerCarte(comboBox_Type.getSelectedIndex()));
         		verticalBox.add(chartPanel);
+        	    chartPanel.setPreferredSize(new java.awt.Dimension(800, 480));
         		verticalBox.repaint();
         	}
-        });                
+        });              
 	}
 	
 	private void creerInterface() {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 640, 480);
+		setBounds(100, 100, 800, 480);
 		
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
@@ -88,84 +90,99 @@ public class AxisChartDialog extends JDialog {
         panel = new JPanel();
         verticalBox.add(panel);
         
-        lbl_Choisir = new JLabel("Choisir le type de tryage :");
+        lbl_Choisir = new JLabel("Choisir le type de comparaison :");
         panel.add(lbl_Choisir);
         
-        // add the chart to a panel...
-        chartPanel = new ChartPanel(creerCarte());
-        verticalBox.add(chartPanel);
-        chartPanel.setPreferredSize(new java.awt.Dimension(640, 480));
-        
         comboBox_Type = new JComboBox<String>();
-        comboBox_Type.setModel(new DefaultComboBoxModel<String>(new String[] {"Par nombre de visites total", 
-        																	  "Par nombre de visites en debut de session", 
-        																	  "Par nombre de visites en fin de session"}));
+        comboBox_Type.setModel(new DefaultComboBoxModel<String>(new String[] {"Par nombre d'interactions avec outil", 
+        																	  "Par la longeur du text"}));
         comboBox_Type.setSelectedIndex(0);
         panel.add(comboBox_Type);      
+        
+        // add the chart to a panel...
+        chartPanel = new ChartPanel(creerCarte(comboBox_Type.getSelectedIndex()));
+        verticalBox.add(chartPanel);
+        chartPanel.setPreferredSize(new java.awt.Dimension(800, 480));
 	}
 	
-	private JFreeChart creerCarte() {
-		CategoryDataset dataset = createDataset(analyserSession);
+	private JFreeChart creerCarte(int type) {
+		CategoryDataset dataset = createDataset(analyserSession, type);
 
         // Create the chart...
         JFreeChart chart = ChartFactory.createBarChart(
             "",        				   // chart title
-            "Categorie",               // domain axis label
-            "Nombre de visites",       // range axis label
-            dataset,                  // data
+            "Utilisateur",             // domain axis label
+            "",       				   // range axis label
+            dataset,                   // data
             PlotOrientation.VERTICAL,
             true,                      // include legend
-            true,                      // tooltips?
+            false,                      // tooltips?
             false                      // URL generator?  Not required...
         );
 
         // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
-        chart.setBackgroundPaint(Color.white);
+//        chart.setBackgroundPaint(Color.darkGray);
 
         // get a reference to the plot for further customisation...
         final CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(new Color(0xEE, 0xEE, 0xFF));
-        plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
-
+        plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        plot.setBackgroundPaint(Color.black);
+        
+        CategoryItemRenderer cir = plot.getRenderer(); 
+        cir.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        cir.setBaseItemLabelsVisible(true);
+        cir.setBaseItemLabelPaint(Color.white);
+        
         final CategoryAxis domainAxis = plot.getDomainAxis();
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
-        
+       
         return chart;
 	}
 	
-	private CategoryDataset createDataset(AnalyserSession analyserSession) {
-		analyserSession.trierPages(typeDeTrier);
-		List<Page> pages = analyserSession.getPages();
+	private CategoryDataset createDataset(AnalyserSession analyserSession, int type) {
+		List<Utilisateur> utilisateurs = analyserSession.getUtilisateurs();
 		
 		int nbElement;
-		if (pages.size() < NB_ELEMENT) {
-			nbElement = pages.size();
+		if (utilisateurs.size() < NB_ELEMENT) {
+			nbElement = utilisateurs.size();
 		} else {
 			nbElement = NB_ELEMENT;
 		}
 		
         // row keys...
-		String[] series = new String[NB_SERIE];
-        series[0] = "Nombre de visites";
-        series[1] = "Nombre de visites en debut de session";
-        series[2] = "Nombre de visites en fin de session";
+		String[] series;
+		if (type == TYPE_INTERACTION) {
+			series = new String[NB_SERIE_INTERACTION];
+	        series[0] = "Nombre d'interaction dans l'etape 1";
+	        series[1] = "Nombre d'interaction dans l'etape 2";
+	        series[2] = "Nombre d'interaction dans l'etape 3";
+	        series[3] = "Nombre d'interaction dans l'etape 4";
+		} else { // if (type == TYPE_LONGEUR) {
+			series = new String[NB_SERIE_LONGEUR];
+	        series[0] = "La longeur du text";
+		} 
 
         // column keys...
         String[] categories = new String[nbElement];
         for (int i = 0; i < nbElement; i++) {
-        	categories[i] = pages.get(i).getLien();
+        	categories[i] = utilisateurs.get(i).getNom();
         }
 
         // create the dataset...
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         for (int i = 0; i < nbElement; i++) {
-        	dataset.addValue(pages.get(i).getNombre(Page.NOMBRE_TOTAL), series[0], categories[i]);
-        	dataset.addValue(pages.get(i).getNombre(Page.NOMBRE_DEBUT), series[1], categories[i]);
-        	dataset.addValue(pages.get(i).getNombre(Page.NOMBRE_FIN), series[2], categories[i]);
+        	for (int j = 0; j < series.length; j++) {
+        		if (type == TYPE_INTERACTION) {
+        			dataset.addValue(utilisateurs.get(i).getNombreAction(Utilisateur.ETAPE[j]), series[j], categories[i]);
+        		} else if (type == TYPE_LONGEUR) {
+        			System.err.println(utilisateurs.get(i).getNombreText());
+        			dataset.addValue(utilisateurs.get(i).getNombreText(), series[j], categories[i]);
+        		}
+        	}
         }
 
         return dataset;
-
     }
 }

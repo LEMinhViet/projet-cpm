@@ -43,16 +43,21 @@ import org.xml.sax.SAXException;
 import support.CoffeeToLog;
 import filtrer.Filtre;
 import filtrer.FiltreDate;
+import filtrer.FiltreEtape;
 import filtrer.FiltreIP;
 import filtrer.FiltreNavigateurs;
+import filtrer.FiltreOutil;
 import filtrer.FiltreStatutHTTP;
 import filtrer.FiltreTypeFichier;
+import filtrer.FiltreUtilisateur;
 import filtrer.Format;
 import filtrer.FormatLog;
 import filtrer.StockerLogs;
 import filtrer.Traitement;
 
 public class MainGUI {
+
+	private static boolean utiliseXML = false;
 
 	private JFrame mainFrame;
 
@@ -115,7 +120,7 @@ public class MainGUI {
 	private JLabel lblChargerXML;
 	private JButton Button_XML;
 	private Component fichierStut;
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -163,16 +168,25 @@ public class MainGUI {
 						CoffeeToLog coffeeToLog = new CoffeeToLog();
 						coffeeToLog.transformerCoffeeLog(c.getSelectedFile().getAbsolutePath());
 						
-						nomFichierLog = c.getSelectedFile().getName().replace("xml", "txt");
+						nomFichierLog = c.getSelectedFile().getAbsolutePath().replace("xml", "txt");
 						// Obtenir le nombre des lignes dans le fichier logs					
 		    		    getNbLignes(nomFichierLog);
 						
+		    		    // Permettre seulement le button Filtrage 
 						Button_Filtrage.setEnabled(true);
 						Button_Statistiques.setEnabled(false);
 						Button_Creer.setEnabled(false);
 						Button_CreationResultat.setEnabled(false);
 						Button_Analyser.setEnabled(false);
-						Button_AnalyseResultat.setEnabled(false);			
+						Button_AnalyseResultat.setEnabled(false);	
+						
+						// Modifier l'interface pour le fichier Xml - COFFee Log
+						utiliseXML = true;
+						CheckBox_Navigateurs.setEnabled(false);
+						CheckBox_HTTP.setText("FiltreEtape");
+						CheckBox_Fichier.setText("FiltreOutil");
+						CheckBox_IP.setText("FiltreUtilisateur");
+						
 					} catch (ParserConfigurationException | SAXException
 							| IOException e1) {
 						// TODO Auto-generated catch block
@@ -180,8 +194,7 @@ public class MainGUI {
 					}
 				}
 			}
-		});
-		
+		});		
 		
 		btnFichier.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -194,16 +207,24 @@ public class MainGUI {
 				// Demonstrater "Open" dialog:
 				int rVal = c.showOpenDialog(mainFrame);
 				if (rVal == JFileChooser.APPROVE_OPTION) {
-					nomFichierLog = c.getSelectedFile().getName();
+					nomFichierLog = c.getSelectedFile().getAbsolutePath();
 					// Obtenir le nombre des lignes dans le fichier logs					
 	    		    getNbLignes(nomFichierLog);
 					
+	    		    // Permettre seulement le button Filtrage 
 					Button_Filtrage.setEnabled(true);
 					Button_Statistiques.setEnabled(false);
 					Button_Creer.setEnabled(false);
 					Button_CreationResultat.setEnabled(false);
 					Button_Analyser.setEnabled(false);
-					Button_AnalyseResultat.setEnabled(false);			
+					Button_AnalyseResultat.setEnabled(false);	
+					
+					// Modifier l'interface pour le fichier log txt
+					utiliseXML = false;
+					CheckBox_Navigateurs.setEnabled(true);
+					CheckBox_HTTP.setText("FiltreHTTP");
+					CheckBox_Fichier.setText("FiltreFichier");
+					CheckBox_IP.setText("FiltreIP");
 				}
 			}
 		});
@@ -226,15 +247,27 @@ public class MainGUI {
 				} 
 				
 				if (CheckBox_Fichier.isSelected()) {
-					traitement.addFiltre(new FiltreTypeFichier(f, textField_TypeFichier.getText()));
+					if (utiliseXML) {	// Filtrer les outils
+						traitement.addFiltre(new FiltreOutil(f, textField_TypeFichier.getText()));
+					} else {
+						traitement.addFiltre(new FiltreTypeFichier(f, textField_TypeFichier.getText()));
+					}
 				} 
 				
 				if (CheckBox_HTTP.isSelected()) {
-					traitement.addFiltre(new FiltreStatutHTTP(f, textField_HTTP.getText()));
+					if (utiliseXML) {	// Filtrer les etapes
+						traitement.addFiltre(new FiltreEtape(f, textField_HTTP.getText()));
+					} else {
+						traitement.addFiltre(new FiltreStatutHTTP(f, textField_HTTP.getText()));
+					}
 				} 
 				
 				if (CheckBox_IP.isSelected()) {
-					traitement.addFiltre(new FiltreIP(f, textField_IP.getText()));
+					if (utiliseXML) { 	// Filtrer les utilisateurs
+						traitement.addFiltre(new FiltreUtilisateur(f, textField_IP.getText()));
+					} else {
+						traitement.addFiltre(new FiltreIP(f, textField_IP.getText()));	
+					}					
 				} 
 				
 				if (CheckBox_Navigateurs.isSelected()) {
@@ -243,7 +276,7 @@ public class MainGUI {
 				
 				traitement.addFiltre(new StockerLogs(f));
 				// Traiter les filtrages
-				traite();			        				
+				traiteFiltre();			        				
 			}
 		});
 
@@ -251,9 +284,18 @@ public class MainGUI {
 			public void actionPerformed(ActionEvent e) {
 				traitement.analyserSession();
 				// Afficher un dialog pour les resultats 
-				AxisChartDialog axisChartDialog = new AxisChartDialog(traitement.getAnalyserSession());
-				axisChartDialog.setVisible(true);
-				Button_Creer.setEnabled(true);
+				if (utiliseXML) {
+					AxisChart_XML axisChart = new AxisChart_XML(traitement.getAnalyserSession());
+					axisChart.setVisible(true);
+				} else {
+					AxisChart_Log axisChart = new AxisChart_Log(traitement.getAnalyserSession());
+					axisChart.setVisible(true);
+				}
+				
+				if (utiliseXML) {
+					Button_Creer.setEnabled(true);
+				}
+				
 				lblResultatStats.setText("Done");
 			}
 		});
@@ -310,7 +352,7 @@ public class MainGUI {
 	/**
 	 * Creer et executer la tache de lire et valider le fichier log
 	 */
-	public void traite() {
+	public void traiteFiltre() {
 		if (tache != null && !tache.isDone()) {
 			tache.cancel(true);
 		}
@@ -577,5 +619,9 @@ public class MainGUI {
 		
 		lbl_Sessions = new JLabel("session(s)");
 		panel_status.add(lbl_Sessions);
+	}
+
+	public static boolean getUtiliseXML() {
+		return utiliseXML;
 	}
 }

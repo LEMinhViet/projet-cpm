@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,8 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public class CoffeeToLog {
+	private HashMap<String, String> UserIP = new HashMap<String, String>();
+	
 	/**
 	 * Transsformer le fichier Coffee au fichier Log
 	 * @param nom
@@ -53,27 +56,27 @@ public class CoffeeToLog {
 				NamedNodeMap messageHeaderAttributes = messageHeader.getAttributes();
 				
 				String sLog = "";
-				// On sauver les 4 types de record : 
-				// SessionType : information sur les sessions
-				// ConnectionType : information sur les connections des utilisateurs
-				// DisconnectionType : information sur les disconnections des utilisateurs
-				// GenericType : information sur les actions des utilisateurs dans les sessions
-				//
-				//       IP      UTILISATEUR         DATE                     OUTIL                 -                CONTENUE (TEXT)          ETAPE       OUTIL               TYPE
-				// 132.227.113.204 SERVER - [11/12/2012:15:52:52 +0200] "MLThreadedChatServerMessage L'homophobie est un délit puni par la loi" 2 - "mlThreadedChatTool" "GenericType"
-				if (messageHeaderAttributes.getNamedItem("messageType").getNodeValue().equals("SessionType")) {
-					sLog = getSessionType(message, messageHeaderAttributes);
-				} else if (messageHeaderAttributes.getNamedItem("messageType").getNodeValue().equals("ConnectionType")) {
-					sLog = getConnectionType(message, messageHeaderAttributes);
-				} else if (messageHeaderAttributes.getNamedItem("messageType").getNodeValue().equals("DisconnectionType")) {
-					sLog = getDisconnectionType(message, messageHeaderAttributes);
+				/* On sauver les 4 types de record : 
+				 * SessionType : information sur les sessions
+				 * ConnectionType : information sur les connections des utilisateurs
+				 * DisconnectionType : information sur les disconnections des utilisateurs
+				 * GenericType : information sur les actions des utilisateurs dans les sessions
+				 *
+				 *       IP      UTILISATEUR         DATE                     OUTIL                 -                CONTENUE (TEXT)          ETAPE       OUTIL               TYPE
+				 * 132.227.113.204 SERVER - [11/12/2012:15:52:52 +0200] "MLThreadedChatServerMessage L'homophobie est un délit puni par la loi" 2 - "mlThreadedChatTool" "GenericType"
+				 */
+				if (messageHeaderAttributes.getNamedItem("messageType").getNodeValue().equals("ConnectionType")) {
+					getConnectionType(message, messageHeaderAttributes);
 				} else if (messageHeaderAttributes.getNamedItem("messageType").getNodeValue().equals("GenericType")) {
 					sLog = getGenericType(message, messageHeaderAttributes);
+					fw.write(sLog + "\n");
 				} else {
 					continue;
 				}
-				
-				fw.write(sLog + "\n");
+				/*
+				 * On a besoin seulement des actions des utilisateur => pour les autres types, on laisse tomber 
+				 * Mais on utilise le ConnectionType pour garder l'ensemble de IP et Utilisateur
+				 */
 			}
 			
 		}
@@ -113,8 +116,11 @@ public class CoffeeToLog {
 		ip = ip.split(":")[0];
 		sbLog.append(ip);
 		
-		sbLog.append(" " + messageHeaderAttributes.getNamedItem("UserName").getNodeValue());
+		String nom = messageHeaderAttributes.getNamedItem("UserName").getNodeValue().replace(" ", "_"); 
+		sbLog.append(" " + nom);
 		sbLog.append(" -");
+		
+		if (!UserIP.containsKey(nom)) 	UserIP.put(nom, ip); 
 		
 		long millis = Long.parseLong(messageHeaderAttributes.getNamedItem("millis").getNodeValue());
 		sbLog.append(" [" + (new CPMCalendar(millis)).getDateString() + "]");
@@ -138,7 +144,7 @@ public class CoffeeToLog {
 		ip = ip.split(":")[0];
 		sbLog.append(ip);
 		
-		sbLog.append(" " + messageHeaderAttributes.getNamedItem("UserName").getNodeValue());
+		sbLog.append(" " + messageHeaderAttributes.getNamedItem("UserName").getNodeValue().replace(" ", "_"));
 		sbLog.append(" -");
 		
 		long millis = Long.parseLong(messageHeaderAttributes.getNamedItem("millis").getNodeValue());
@@ -163,35 +169,60 @@ public class CoffeeToLog {
 	public String getGenericType(Node message, NamedNodeMap messageHeaderAttributes) {
 		StringBuilder sbLog = new StringBuilder();
 		
+		// Obtenir le IP
 		String ip = messageHeaderAttributes.getNamedItem("From").getNodeValue().split("/")[2];
 		ip = ip.split(":")[0];
 		sbLog.append(ip);
 		
-		sbLog.append(" " + messageHeaderAttributes.getNamedItem("UserName").getNodeValue());
+		// Obtenir le nom 
+		sbLog.append(" " + messageHeaderAttributes.getNamedItem("UserName").getNodeValue().replace(" ", "_"));		
 		sbLog.append(" -");
 		
+		// Obtenir le temps
 		long millis = Long.parseLong(messageHeaderAttributes.getNamedItem("millis").getNodeValue());
 		sbLog.append(" [" + (new CPMCalendar(millis)).getDateString() + "]");
 		
-		// totale : 895 - mlThreadedChatTool : 148 - positionometerTool : 80 - graphicalTool : 532 - NoteTool : 135
+		// totale : 725 - mlThreadedChatTool : 56 - positionometerTool : 410 - graphicalTool : 259
 		Node toolMessageContent = message.getLastChild().getFirstChild();
+		
+		/**
+		 * Pour le positionometerTool
+		 */
 		if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("positionometerTool")) {
+			NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
 			if ("PositionometerMessage".equals(toolMessageContent.getNodeName())) {
-				NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
 				sbLog.append(" \"" + toolMessageContent.getNodeName() + 
 						     " " + toolMessageAttributes.getNamedItem("vote").getNodeValue() + "\"");
 			} else {
 				sbLog.append(" \"" + toolMessageContent.getNodeName() + "\"");
 			}			
-		} else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("mlThreadedChatTool")) {
-			if ("MLThreadedChatServerMessage".equals(toolMessageContent.getNodeName())) {
-				NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
+		} 
+		
+		/**
+		 * Pour le mlThreadedChatTool
+		 */
+		else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("mlThreadedChatTool")) {
+			NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
+			
+			if (toolMessageAttributes.getNamedItem("text") != null) {
+				// On remplace le nom SERVER par le vrai nom d'utilisateur dans les MLThreadedChatServerMessage
+				String vraiNom = toolMessageAttributes.getNamedItem("from").getNodeValue().replace(" ", "_");
+				
+				if (!vraiNom.equals("SERVER") && !vraiNom.equals("Enseignant")) {
+					sbLog.setLength(0);
+					sbLog.append(UserIP.get(vraiNom) + " " + vraiNom + " - [" + (new CPMCalendar(millis)).getDateString() + "]");
+				}
+				
+				// Ajouter le symbole * pour indiquer que les text apres sont les texts des utilisateurs
 				sbLog.append(" \"" + toolMessageContent.getNodeName() +
-						     " " + toolMessageAttributes.getNamedItem("text").getNodeValue() + "\"");
+					     " *" + toolMessageAttributes.getNamedItem("text").getNodeValue().replace(" ", "_") + "\"");
 			} else {
 				sbLog.append(" \"" + toolMessageContent.getNodeName() + "\"");
 			}
-		} else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("notetool")) {
+		} 
+		
+		/** Il n' y pas cet outil dans cette version du fichier COFFEE log
+		else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("notetool")) {
 			if ("NoteMessage".equals(toolMessageContent.getNodeName())) {
 				NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
 				sbLog.append(" \"" + toolMessageContent.getNodeName() +
@@ -199,13 +230,18 @@ public class CoffeeToLog {
 			} else {
 				sbLog.append(" \"" + toolMessageContent.getNodeName() + "\"");
 			}	
-		} else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("graphicalTool")) {
+		} */ 
+		
+		/**
+		 * Pour le graphicalTool
+		 */
+		else if (messageHeaderAttributes.getNamedItem("ToolName").getNodeValue().equals("graphicalTool")) {
 			if ("graphicalToolMessage".equals(toolMessageContent.getNodeName())) {
 				NamedNodeMap toolMessageAttributes = toolMessageContent.getAttributes();
 				sbLog.append(" \"" + toolMessageContent.getNodeName() +
 						     " " + toolMessageAttributes.getNamedItem("typeID").getNodeValue());
 				if (toolMessageAttributes.getNamedItem("text") != null) {
-					sbLog.append(" " + toolMessageAttributes.getNamedItem("text").getNodeValue());
+					sbLog.append(" " + toolMessageAttributes.getNamedItem("text").getNodeValue().replace(" ", "_"));
 				}
 				sbLog.append("\"");
 			} else {

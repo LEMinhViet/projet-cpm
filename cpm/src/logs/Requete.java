@@ -56,4 +56,18 @@ public class Requete {
 		}
 	}
 
+	public int getNombreText() {
+		// Pour seulement le fichier COFFEE
+		String[] contenueArray = contenue.split(" "); 
+		if (contenueArray.length > 1) {
+			String derniereContenue = contenueArray[contenueArray.length - 1];
+			if (derniereContenue.startsWith("*")) {
+				return derniereContenue.length() - 1;	// -1 pour le symbole * avant les texts
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		} 
+	}
 }
