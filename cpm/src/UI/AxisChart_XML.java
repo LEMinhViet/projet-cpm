@@ -176,7 +176,6 @@ public class AxisChart_XML extends JFrame {
         		if (type == TYPE_INTERACTION) {
         			dataset.addValue(utilisateurs.get(i).getNombreAction(Utilisateur.ETAPE[j]), series[j], categories[i]);
         		} else if (type == TYPE_LONGEUR) {
-        			System.err.println(utilisateurs.get(i).getNombreText());
         			dataset.addValue(utilisateurs.get(i).getNombreText(), series[j], categories[i]);
         		}
         	}

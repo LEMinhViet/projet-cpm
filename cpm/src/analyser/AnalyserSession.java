@@ -141,8 +141,8 @@ public class AnalyserSession {
 		return nomFichier.split("\\.")[0] + ".arff";
 	}
 	
-	public String analyserARFF(String nomFichier) {
-		traiterArff.traiterARFF_KMeans(nomFichier, 9);
+	public String analyserARFF(String nomFichier, int nbGroupe) {
+		traiterArff.traiterARFF_KMeans(nomFichier, nbGroupe);
 		return traiterArff.interpreterCluster(nomFichier.split("\\.")[0] + "_kmeans.arff"); 
 	}
 }

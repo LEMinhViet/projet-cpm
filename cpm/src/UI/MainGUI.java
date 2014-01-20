@@ -2,6 +2,7 @@ package UI;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
@@ -21,8 +22,10 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,6 +41,7 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.xml.sax.SAXException;
 
 import support.CoffeeToLog;
@@ -119,7 +123,10 @@ public class MainGUI {
 	private JLabel lblResultatStats;
 	private JLabel lblChargerXML;
 	private JButton Button_XML;
-	private Component fichierStut;
+	private Component fichierStutGauche;
+	private Component fichierStutDroit;
+	private JComboBox<Integer> comboBox_NombreGroupe;
+	private JLabel Label_Ou;
 	
 	/**
 	 * Launch the application.
@@ -157,7 +164,7 @@ public class MainGUI {
 				JFileChooser c = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml", "xml");
 				c.setFileFilter(filter);
-				c.setCurrentDirectory(new File("/users/Etu1/3261731/workspace/cpm"));
+				c.setCurrentDirectory(new File("/users/Etu1/3261731/workspace/CPM"));
 
 				// Demonstrater "Open" dialog:
 				int rVal = c.showOpenDialog(mainFrame);
@@ -314,7 +321,7 @@ public class MainGUI {
 		});
 		Button_Analyser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				nomFichierARFFResult = traitement.analyserARFF(nomFichierARFF);
+				nomFichierARFFResult = traitement.analyserARFF(nomFichierARFF, (int)comboBox_NombreGroupe.getSelectedItem());
 				lblResultatAnalyser.setText("Done");
 				Button_AnalyseResultat.setEnabled(true);
 			}
@@ -433,7 +440,7 @@ public class MainGUI {
 		BorderLayout borderLayout = (BorderLayout) mainFrame.getContentPane().getLayout();
 		borderLayout.setVgap(10);
 		borderLayout.setHgap(10);
-		mainFrame.setBounds(100, 100, 640, 540);
+		mainFrame.setBounds(100, 100, 740, 553);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		panel_fichier = new JPanel();
@@ -444,7 +451,7 @@ public class MainGUI {
 		horizontalBox = Box.createHorizontalBox();
 		panel_fichier.add(horizontalBox);
 		
-		lblChargerXML = new JLabel("0. Charger le fichier XML :      ");
+		lblChargerXML = new JLabel("1. Charger le fichier XML :      ");
 		lblChargerXML.setHorizontalAlignment(SwingConstants.TRAILING);
 		horizontalBox.add(lblChargerXML);
 		lblChargerXML.setAlignmentX(0.5f);
@@ -453,8 +460,14 @@ public class MainGUI {
 		Button_XML.setAlignmentX(0.5f);
 		horizontalBox.add(Button_XML);
 		
-		fichierStut = Box.createHorizontalStrut(80);
-		horizontalBox.add(fichierStut);
+		fichierStutGauche = Box.createHorizontalStrut(30);
+		horizontalBox.add(fichierStutGauche);
+		
+		Label_Ou = new JLabel("Ou");
+		horizontalBox.add(Label_Ou);
+		
+		fichierStutDroit = Box.createHorizontalStrut(30);
+		horizontalBox.add(fichierStutDroit);
 		
 		lblCharger = new JLabel("1. Charger le fichier Logs :      ");
 		lblCharger.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -572,6 +585,15 @@ public class MainGUI {
 		horizontalBox_Analyser.setAlignmentX(Component.LEFT_ALIGNMENT);
 		verticalBox.add(horizontalBox_Analyser);
 		
+		comboBox_NombreGroupe = new JComboBox<Integer>();
+		comboBox_NombreGroupe.setModel(new DefaultComboBoxModel<Integer>(new  Integer[] {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}));
+		comboBox_NombreGroupe.setSelectedIndex(0);
+		comboBox_NombreGroupe.setPreferredSize(new Dimension(50, 20));
+		comboBox_NombreGroupe.setMinimumSize(new Dimension(50, 20));
+		comboBox_NombreGroupe.setMaximumSize(new Dimension(50, 20));
+		comboBox_NombreGroupe.setMaximumRowCount(21);
+		horizontalBox_Analyser.add(comboBox_NombreGroupe);
+		
 		Button_Analyser = new JButton("Analyser");
 		horizontalBox_Analyser.add(Button_Analyser);
 		Button_Analyser.setEnabled(false);
@@ -583,6 +605,7 @@ public class MainGUI {
 		
 		lblResultatAnalyser = new JLabel("");
 		horizontalBox_Analyser.add(lblResultatAnalyser);
+		horizontalBox_Analyser.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{comboBox_NombreGroupe, Button_Analyser, Button_AnalyseResultat, lblResultatAnalyser}));
 		
 		scrollPane = new JScrollPane();
 		mainFrame.getContentPane().add(scrollPane, BorderLayout.CENTER);

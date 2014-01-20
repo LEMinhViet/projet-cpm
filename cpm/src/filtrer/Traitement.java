@@ -159,8 +159,8 @@ public class Traitement {
 		return analyserSession.creerARFF(nomFichier);
 	}
 	
-	public String analyserARFF(String nomFichier) {
-		return analyserSession.analyserARFF(nomFichier);
+	public String analyserARFF(String nomFichier, int nbGroupe) {
+		return analyserSession.analyserARFF(nomFichier, nbGroupe);
 	}
 	
 	public String getFichier() {
