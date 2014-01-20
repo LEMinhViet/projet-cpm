@@ -41,7 +41,6 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.xml.sax.SAXException;
 
 import support.CoffeeToLog;
@@ -605,7 +604,6 @@ public class MainGUI {
 		
 		lblResultatAnalyser = new JLabel("");
 		horizontalBox_Analyser.add(lblResultatAnalyser);
-		horizontalBox_Analyser.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{comboBox_NombreGroupe, Button_Analyser, Button_AnalyseResultat, lblResultatAnalyser}));
 		
 		scrollPane = new JScrollPane();
 		mainFrame.getContentPane().add(scrollPane, BorderLayout.CENTER);
